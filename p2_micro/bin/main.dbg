@@ -5474,13 +5474,35 @@ Entry:
             BSET DDRA,$04
             BCLR DDRA,$03
             BSET DDRB,$FF
-VERIFICA    BSET PORTB,$01        
-            BRSET PORTB,$01,BOTAO1            
+VERIFICA    BSET PORTB,$04        
+            BRSET PORTB,$01,BOTAO1
+            BRSET PORTB,$02,BOTAO2
+            BRSET PORTB,$03,BOTAO3
+            BRSET PORTB,$04,BOTAO4            
           
             BRA VERIFICA
             
             
-BOTAO1:     LDAB #$FF           
+BOTAO1:     BSET PORTA,$04
+
+            ;contagem crescente em segundos no display
+
+            ;só para com interrupção
+         
+           
+BOTAO2:
+
+            RTS
+            
+BOTAO3: 
+
+            RTS
+            
+BOTAO4:     BSET PORTA,$04
+CONTINUA    NOP
+            BRSET PORTB,$04,CONTINUA
+
+            RTS                                   
 
 
             ORG   $FFFE

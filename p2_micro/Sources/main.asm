@@ -30,9 +30,12 @@ VERIFICA
             BRA VERIFICA
             
             
-BOTAO1:     
+BOTAO1:     BSET PORTA,$04
+
+            ;contagem crescente em segundos no display
+
+            ;só para com interrupção
          
-            RTS
            
 BOTAO2:
 
@@ -42,9 +45,18 @@ BOTAO3:
 
             RTS
             
-BOTAO4: 
+BOTAO4:     BSET PORTA,$04
+CONTINUA    NOP
+
+            ;contagem crescente em segundos no display
+
+            ;para se tiver interrupção
+
+            BRSET PORTB,$04,CONTINUA
+            BCLR PORTA,$04
 
             RTS                                   
+
 
             ORG   $FFFE
             DC.W  Entry           ; Reset Vector
