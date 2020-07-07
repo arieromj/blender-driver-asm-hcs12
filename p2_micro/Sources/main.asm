@@ -18,23 +18,23 @@
             ORG $1000
             
 Entry:
-            BSET DDRA,$04
-            BCLR DDRA,$03
+            BSET DDRA,$06
+            BCLR DDRA,$07
             BSET DDRB,$FF
 VERIFICA            
-            BRSET PORTB,$01,BOTAO1
-            BRSET PORTB,$02,BOTAO2
-            BRSET PORTB,$03,BOTAO3
-            BRSET PORTB,$04,BOTAO4            
+            BRSET PORTA,$01,BOTAO1
+            BRSET PORTA,$02,BOTAO2
+            BRSET PORTA,$03,BOTAO3
+            BRSET PORTA,$04,BOTAO4            
           
             BRA VERIFICA
             
             
-BOTAO1:     BSET PORTA,$04
+BOTAO1:     BSET PORTA,$06
 
             ;contagem crescente em segundos no display
 
-            ;só para com interrupção
+            ;só para com interrupção do botao 1
          
            
 BOTAO2:
@@ -45,15 +45,15 @@ BOTAO3:
 
             RTS
             
-BOTAO4:     BSET PORTA,$04
+BOTAO4:     BSET PORTA,$06
 CONTINUA    NOP
 
             ;contagem crescente em segundos no display
 
-            ;para se tiver interrupção
+            ;para se tiver interrupção do botao 1
 
-            BRSET PORTB,$04,CONTINUA
-            BCLR PORTA,$04
+            BRSET PORTA,$04,CONTINUA
+            BCLR PORTA,$06
 
             RTS                                   
 

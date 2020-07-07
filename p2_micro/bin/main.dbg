@@ -5474,7 +5474,7 @@ Entry:
             BSET DDRA,$04
             BCLR DDRA,$03
             BSET DDRB,$FF
-VERIFICA    BSET PORTB,$04        
+VERIFICA            
             BRSET PORTB,$01,BOTAO1
             BRSET PORTB,$02,BOTAO2
             BRSET PORTB,$03,BOTAO3
@@ -5487,7 +5487,7 @@ BOTAO1:     BSET PORTA,$04
 
             ;contagem crescente em segundos no display
 
-            ;só para com interrupção
+            ;só para com interrupção do botao 1
          
            
 BOTAO2:
@@ -5500,7 +5500,13 @@ BOTAO3:
             
 BOTAO4:     BSET PORTA,$04
 CONTINUA    NOP
+
+            ;contagem crescente em segundos no display
+
+            ;para se tiver interrupção do botao 1
+
             BRSET PORTB,$04,CONTINUA
+            BCLR PORTA,$04
 
             RTS                                   
 
