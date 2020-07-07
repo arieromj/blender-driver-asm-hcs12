@@ -18,14 +18,14 @@
             ORG $1000
             
 Entry:
-            BSET DDRA,$06
-            BCLR DDRA,$07
-            BSET DDRB,$FF
+            BSET DDRA,$06                  ;define o bit 3 da PORTA como saída
+            BCLR DDRA,$07                  ;define os bits 0,1 e 2 da PORTA como entrada
+            BSET DDRB,$FF                  ;define todos os bits da POTB como saída
 VERIFICA            
-            BRSET PORTA,$01,BOTAO1
-            BRSET PORTA,$02,BOTAO2
-            BRSET PORTA,$03,BOTAO3
-            BRSET PORTA,$04,BOTAO4            
+            BRSET PORTA,$01,BOTAO1         ;verifica se o botao 1 está apertado
+            BRSET PORTA,$02,BOTAO2         ;verifica se o botao 2 está apertado
+            BRSET PORTA,$03,BOTAO3         ;verifica se o botao 3 está apertado
+            BRSET PORTA,$04,BOTAO4         ;verifica se o botao 4 está apertado   
           
             BRA VERIFICA
             
