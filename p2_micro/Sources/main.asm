@@ -61,6 +61,7 @@ BOTAO4      BSET PORTA,$10
             BSET CONTSEC,$0A 
             BSET CONTMIN,$09
             JSR DISPLAYINC2
+            BRSET PORTA,$08,BOTAO4
 
             BRA VERIFICA
             
