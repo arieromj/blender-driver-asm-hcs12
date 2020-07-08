@@ -5476,11 +5476,11 @@ CONTMIN     DS.B 1
             
 Entry:      
             BSET DDRA,$10                  ;define o bit 4 da PORTA como saída
-            BSET DDRA,$0F                  ;define os bits 0,1,2 e 3 da PORTA como entrada
+            BCLR DDRA,$0F                  ;define os bits 0,1,2 e 3 da PORTA como entrada
             BSET DDRB,$FF                  ;define todos os bits da PORTB como saída. Dígito 1 BCD
             BSET DDRE,$FF                  ;define todos os bits da PORTE como saída. Dígito 2 BCD
             
-VERIFICA    BSET PORTA,$08
+VERIFICA    
             BCLR PORTA,$10
      
             BRSET PORTA,$01,N1             ;verifica se o botao 1 está apertado
