@@ -5476,21 +5476,33 @@ CONTMIN     DS.B 1
             
 Entry:      
             BSET DDRA,$10                  ;define o bit 4 da PORTA como saída
-            BCLR DDRA,$0F                  ;define os bits 0,1,2 e 3 da PORTA como entrada
+            BSET DDRA,$0F                  ;define os bits 0,1,2 e 3 da PORTA como entrada
             BSET DDRB,$FF                  ;define todos os bits da PORTB como saída. Dígito 1 BCD
             BSET DDRE,$FF                  ;define todos os bits da PORTE como saída. Dígito 2 BCD
             
-VERIFICA    BCLR PORTE,$10
+VERIFICA    BSET PORTA,$08
+            BCLR PORTA,$10
      
-            BRSET PORTA,$01,BOTAO1         ;verifica se o botao 1 está apertado
-            BRSET PORTA,$02,BOTAO2         ;verifica se o botao 2 está apertado
-            BRSET PORTA,$04,BOTAO3         ;verifica se o botao 3 está apertado
-            BRSET PORTA,$08,BOTAO4         ;verifica se o botao 4 está apertado   
+            BRSET PORTA,$01,N1             ;verifica se o botao 1 está apertado
+            BRSET PORTA,$02,N2             ;verifica se o botao 2 está apertado
+            BRSET PORTA,$04,N3             ;verifica se o botao 3 está apertado
+            BRSET PORTA,$08,N4             ;verifica se o botao 4 está apertado   
           
             BRA VERIFICA
             
+N1          JSR BOTAO1
+            BRA VERIFICA
+N2          JSR BOTAO2
+            BRA VERIFICA             
+N3          JSR BOTAO3
+            BRA VERIFICA
+N4          JSR BOTAO4
+            BRA VERIFICA 
+ 
+ 
+ 
             
-BOTAO1      BSET PORTA,$10
+BOTAO1:      BSET PORTA,$10
 
 INFINITO    BSET CONTSEC,$0A 
             BSET CONTMIN,$09
@@ -5499,14 +5511,14 @@ INFINITO    BSET CONTSEC,$0A
             BRA INFINITO                  
          
            
-BOTAO2
+BOTAO2:
 
-            BRA VERIFICA
+            RTS
             
 
 BOTAO3 
 
-            BRA VERIFICA
+            RTS
             
 
 BOTAO4      BSET PORTA,$10
@@ -5514,9 +5526,9 @@ BOTAO4      BSET PORTA,$10
             BSET CONTSEC,$0A 
             BSET CONTMIN,$09
             JSR DISPLAYINC2
-            BRSET PORTA,$08,BOTAO4
+            BCLR PORTA,$10
 
-            BRA VERIFICA
+            RTS
             
             
             
@@ -5562,7 +5574,7 @@ LOOP2       BRCLR PORTA,$08,DESLIGA
             INX
             DEC CONTSEC
             ;delay 1 segundo
-            BNE LOOP
+            BNE LOOP2
             
             BSET CONTSEC,$0A
             LDX #BCD
