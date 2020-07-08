@@ -5471,19 +5471,19 @@ mNVFSEC_KEYEN:      equ    %10000000
             ORG $1000
             
 Entry:
-            BSET DDRA,$04
-            BCLR DDRA,$03
-            BSET DDRB,$FF
-VERIFICA            
-            BRSET PORTB,$01,BOTAO1
-            BRSET PORTB,$02,BOTAO2
-            BRSET PORTB,$03,BOTAO3
-            BRSET PORTB,$04,BOTAO4            
+            BSET DDRA,$10                  ;define o bit 3 da PORTA como saída
+            BCLR DDRA,$0F                  ;define os bits 0,1 e 2 da PORTA como entrada
+            BSET DDRB,$FF                  ;define todos os bits da POTB como saída
+VERIFICA    BSET PORTA,$10       
+            BRSET PORTA,$01,BOTAO1         ;verifica se o botao 1 está apertado
+            BRSET PORTA,$02,BOTAO2         ;verifica se o botao 2 está apertado
+            BRSET PORTA,$04,BOTAO3         ;verifica se o botao 3 está apertado
+            BRSET PORTA,$08,BOTAO4         ;verifica se o botao 4 está apertado   
           
             BRA VERIFICA
             
             
-BOTAO1:     BSET PORTA,$04
+BOTAO1:     BSET PORTA,$10
 
             ;contagem crescente em segundos no display
 
@@ -5498,15 +5498,15 @@ BOTAO3:
 
             RTS
             
-BOTAO4:     BSET PORTA,$04
+BOTAO4:     BSET PORTA,$10
 CONTINUA    NOP
 
             ;contagem crescente em segundos no display
 
             ;para se tiver interrupção do botao 1
 
-            BRSET PORTB,$04,CONTINUA
-            BCLR PORTA,$04
+            BRSET PORTA,$08,CONTINUA
+            BCLR PORTA,$10
 
             RTS                                   
 
