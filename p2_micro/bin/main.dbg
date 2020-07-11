@@ -5490,7 +5490,7 @@ Entry:
             
             
 VERIFICA     
-            BRSET PORTE,$04,N1             ;verifica se o botao 1 está apertado
+            BRCLR PORTE,$04,N1             ;verifica se o botao 1 está apertado
             BRCLR PORTE,$08,N2             ;verifica se o botao 2 está apertado
             BRCLR PORTE,$10,N3             ;verifica se o botao 3 está apertado
             BRCLR PORTE,$20,N4             ;verifica se o botao 4 está apertado   
@@ -5514,12 +5514,15 @@ N4          JSR BOTAO4
  
  
             
-BOTAO1:      BSET PORTE,$80
+BOTAO1:     BSET PORTE,$80
 
             BSET CONTSEC,$0A 
             BSET CONTMIN,$09
             JSR DISPLAYINC
             
+            BCLR PORTE,$80
+            BCLR PORTB,$FF
+            BCLR PORTA,$FF
             RTS                  
          
            
@@ -5533,7 +5536,7 @@ BOTAO2:     LDX #DCB+5
             JSR DISPLAYDEC
             
             
-
+            BCLR PORTE,$80
             BCLR PORTB,$FF
             BCLR PORTA,$FF
             RTS
@@ -5547,9 +5550,8 @@ BOTAO3      LDX #DCB+9
             BSET PORTE,$80
             BSET DURACAO,$02
             JSR DISPLAYDEC
-            
-            
-
+                       
+            BCLR PORTE,$80
             BCLR PORTB,$FF
             BCLR PORTA,$FF
             RTS
@@ -5636,7 +5638,7 @@ DESLIGA     RTS
 
 
 
-;Subrotina 2 de Atualização de Display
+;Subrotina 3 de Atualização de Display
 
 DISPLAYDEC:
             
