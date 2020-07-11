@@ -22,20 +22,25 @@ CONTSEC     DS.B 1
 CONTMIN     DS.B 1
             
 Entry:      
-            BSET DDRE,$10                  ;define o bit 4 da PORTE como saída
-            BCLR DDRE,$0F                  ;define os bits 0,1,2 e 3 da PORTE como entrada
+            ;BCLR PEAR,%00101100            ;configura pinos 2,3 e 5 como I/O general purpose
+            ;BSET PEAR,%10010000            ;configura pinos 4 e 7 como I/O general purpose
+            
+            
+            BSET DDRE,$80                  ;define o bit 7 da PORTE como saída
+            BCLR DDRE,$3C                  ;define os bits 2,3,4 e 5 da PORTE como entrada
             BSET DDRB,$FF                  ;define todos os bits da PORTB como saída. Dígito 1 BCD
             BSET DDRA,$FF                  ;define todos os bits da PORTA como saída. Dígito 2 BCD
             
-VERIFICA    
-            BCLR PORTE,$10
+VERIFICA    JSR DELAY1SEC
+            
      
-            BRSET PORTE,$01,N1             ;verifica se o botao 1 está apertado
-            BRSET PORTE,$02,N2             ;verifica se o botao 2 está apertado
-            BRSET PORTE,$04,N3             ;verifica se o botao 3 está apertado
-            BRSET PORTE,$08,N4             ;verifica se o botao 4 está apertado   
+            BRSET PORTE,$04,N1             ;verifica se o botao 1 está apertado
+            BRCLR PORTE,$08,N2             ;verifica se o botao 2 está apertado
+            BRCLR PORTE,$10,N3             ;verifica se o botao 3 está apertado
+            BRCLR PORTE,$20,N4             ;verifica se o botao 4 está apertado   
           
             BRA VERIFICA
+  
             
 N1          JSR BOTAO1
             BRA VERIFICA
@@ -53,7 +58,7 @@ N4          JSR BOTAO4
  
  
             
-BOTAO1:      BSET PORTE,$10
+BOTAO1:      BSET PORTE,$80
 
 INFINITO    BSET CONTSEC,$0A 
             BSET CONTMIN,$09
@@ -76,12 +81,12 @@ BOTAO3
             RTS
             
 
-BOTAO4      BSET PORTE,$10
+BOTAO4      BSET PORTE,$80
 
             BSET CONTSEC,$0A 
             BSET CONTMIN,$09
             JSR DISPLAYINC2
-            BCLR PORTE,$10
+            BCLR PORTE,$80
 
             BCLR PORTB,$FF
             BCLR PORTA,$FF
@@ -102,7 +107,9 @@ LOOP        LDAA X
             STAA PORTB
             INX
             DEC CONTSEC
-            ;delay 1 segundo
+            
+            JSR DELAY1SEC          ;delay 1 segundo
+            
             BNE LOOP
             
             BSET CONTSEC,$0A
@@ -124,13 +131,15 @@ DISPLAYINC2:
             LDAB Y
             STAB PORTA
             
-LOOP2       BRCLR PORTE,$08,DESLIGA
+LOOP2       BRCLR PORTE,$20,DESLIGA
             
             LDAA X
             STAA PORTB
             INX
             DEC CONTSEC
-            ;delay 1 segundo
+            
+            JSR DELAY1SEC          ;delay 1 segundo
+            
             BNE LOOP2
             
             BSET CONTSEC,$0A
@@ -144,6 +153,35 @@ LOOP2       BRCLR PORTE,$08,DESLIGA
             BNE LOOP2
             
 DESLIGA     RTS
+
+
+
+DELAY1SEC:
+            PSHD                          
+            LDAA  #$80
+            STAA  TSCR1                   ;Inicializa time system control 1
+            LDAA  #$00
+            STAA  TSCR2                   ;Inicializa time system control 2 com prescaler = 1
+            
+            BSET  TIOS,%00010000          ;Inicializa bit4 como output compare
+            
+            LDAA  #$01                    ;Indica a ação que quer que faça quando TCNT = TC4 (1=toggle, 2=clear, 3=set)
+            STAA  TCTL1                                   
+                                          
+            LDD   TCNT                    ;Lê o free timer running
+            
+            ADDD  #200
+                               ; 
+            STAA   TC4                     ;Delay de 1s
+
+HERE        BRCLR TFLG1,mTFLG1_C4F,HERE   ;Branch HERE se for zero. 
+            BSET  TFLG1,%00010000         ;Seta o Bit4 para poder reiniciar a operação realizada pelo codigo
+            
+            PULD
+            RTS
+            
+            
+
             
                                   
 
