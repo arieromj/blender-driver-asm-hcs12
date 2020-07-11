@@ -18,8 +18,10 @@
             ORG $1000
             
 BCD         DC.B $3F,$06,$5B,$4F,$66,$6D,$7D,$07,$7F,$67
+DCB         DC.B $67,$7F,$07,$7D,$6D,$66,$4F,$5B,$06,$3F
 CONTSEC     DS.B 1
 CONTMIN     DS.B 1
+DURACAO     DS.B 1
             
 Entry:      
             ;BCLR PEAR,%00101100            ;configura pinos 2,3 e 5 como I/O general purpose
@@ -31,7 +33,9 @@ Entry:
             BSET DDRB,$FF                  ;define todos os bits da PORTB como saída. Dígito 1 BCD
             BSET DDRA,$FF                  ;define todos os bits da PORTA como saída. Dígito 2 BCD
             
-VERIFICA    JSR DELAY1SEC
+            CLI                            ;ativa interrupção
+            
+VERIFICA    JSR BOTAO2
             
      
             BRSET PORTE,$04,N1             ;verifica se o botao 1 está apertado
@@ -67,7 +71,16 @@ INFINITO    BSET CONTSEC,$0A
             BRA INFINITO                  
          
            
-BOTAO2:
+BOTAO2:     LDX #DCB+5
+            LDY #DCB+7
+            BSET CONTSEC,$05 
+            BSET CONTMIN,$03
+            
+            BSET PORTE,$80
+            BSET DURACAO,$03
+            JSR DISPLAYDEC
+            
+            
 
             BCLR PORTB,$FF
             BCLR PORTA,$FF
@@ -106,9 +119,13 @@ DISPLAYINC:
 LOOP        LDAA X
             STAA PORTB
             INX
-            DEC CONTSEC
+            
             
             JSR DELAY1SEC          ;delay 1 segundo
+            
+            
+            
+            DEC CONTSEC
             
             BNE LOOP
             
@@ -156,7 +173,57 @@ DESLIGA     RTS
 
 
 
+DISPLAYDEC:
+            
+            LDAB Y
+            STAB PORTA
+            
+LOOP3        LDAA X
+            STAA PORTB
+            INX
+            
+            
+            ;JSR DELAY1SEC          ;delay 1 segundo
+            
+            DEC DURACAO
+            BRCLR DURACAO,$FF,TOGGLEMOTOR
+SEGUE            
+            DEC CONTSEC
+            
+            BNE LOOP3
+            
+            BSET CONTSEC,$0A
+            LDX #DCB
+            LDAA X
+            STAA PORTB
+            INY
+            LDAB Y
+            STAB PORTA
+            DEC CONTMIN
+            BNE LOOP3
+            
+            RTS
+            
+TOGGLEMOTOR
+            BSET DURACAO,$02
+            BRCLR PORTE,$80,ON
+            BRSET PORTE,$80,OFF
+ON          BSET PORTE,$80
+            BRA SEGUE
+OFF         BCLR PORTE,$80
+            BRA SEGUE
+            
+            
+            
+            
+            
+                       
+
+
+
+
 DELAY1SEC:
+            
             PSHD                          
             LDAA  #$80
             STAA  TSCR1                   ;Inicializa time system control 1
@@ -170,15 +237,18 @@ DELAY1SEC:
                                           
             LDD   TCNT                    ;Lê o free timer running
             
-            ADDD  #200
+            ADDD  #2000
                                ; 
             STAA   TC4                     ;Delay de 1s
 
-HERE        BRCLR TFLG1,mTFLG1_C4F,HERE   ;Branch HERE se for zero. 
+HERE        BRCLR TFLG1,%00010000,HERE   ;Branch HERE se for zero. 
             BSET  TFLG1,%00010000         ;Seta o Bit4 para poder reiniciar a operação realizada pelo codigo
             
             PULD
             RTS
+            
+            
+
             
             
 
