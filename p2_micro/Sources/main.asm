@@ -24,10 +24,7 @@ CONTMIN     DS.B 1
 DURACAO     DS.B 1
             
 Entry:      
-            ;BCLR PEAR,%00101100            ;configura pinos 2,3 e 5 como I/O general purpose
-            ;BSET PEAR,%10010000            ;configura pinos 4 e 7 como I/O general purpose
-            
-            
+                        
             BSET DDRE,$80                  ;define o bit 7 da PORTE como saída
             BCLR DDRE,$3C                  ;define os bits 2,3,4 e 5 da PORTE como entrada
             BSET DDRB,$FF                  ;define todos os bits da PORTB como saída. Dígito 1 BCD
@@ -35,9 +32,11 @@ Entry:
             
             CLI                            ;ativa interrupção
             
-VERIFICA    JSR BOTAO2
+            LDS #RAMEnd+1
+            ANDCC #%10111111
             
-     
+            
+VERIFICA     
             BRSET PORTE,$04,N1             ;verifica se o botao 1 está apertado
             BRCLR PORTE,$08,N2             ;verifica se o botao 2 está apertado
             BRCLR PORTE,$10,N3             ;verifica se o botao 3 está apertado
@@ -64,11 +63,11 @@ N4          JSR BOTAO4
             
 BOTAO1:      BSET PORTE,$80
 
-INFINITO    BSET CONTSEC,$0A 
+            BSET CONTSEC,$0A 
             BSET CONTMIN,$09
             JSR DISPLAYINC
             
-            BRA INFINITO                  
+            RTS                  
          
            
 BOTAO2:     LDX #DCB+5
@@ -87,7 +86,16 @@ BOTAO2:     LDX #DCB+5
             RTS
             
 
-BOTAO3 
+BOTAO3      LDX #DCB+9
+            LDY #DCB+3
+            BSET CONTSEC,$01 
+            BSET CONTMIN,$07
+            
+            BSET PORTE,$80
+            BSET DURACAO,$02
+            JSR DISPLAYDEC
+            
+            
 
             BCLR PORTB,$FF
             BCLR PORTA,$FF
@@ -108,7 +116,7 @@ BOTAO4      BSET PORTE,$80
             
             
             
-            
+;Subrotina 1 de Atualização de Display            
             
 DISPLAYINC:
             LDX #BCD
@@ -141,6 +149,8 @@ LOOP        LDAA X
             
             RTS
             
+
+;Subrotina 2 de Atualização de Display
             
 DISPLAYINC2:
             LDX #BCD
@@ -172,6 +182,8 @@ LOOP2       BRCLR PORTE,$20,DESLIGA
 DESLIGA     RTS
 
 
+
+;Subrotina 2 de Atualização de Display
 
 DISPLAYDEC:
             
@@ -206,21 +218,16 @@ SEGUE
             
 TOGGLEMOTOR
             BSET DURACAO,$02
-            BRCLR PORTE,$80,ON
-            BRSET PORTE,$80,OFF
-ON          BSET PORTE,$80
-            BRA SEGUE
-OFF         BCLR PORTE,$80
+            LDAA PORTE
+            EORA #$80
+            STAA PORTE
             BRA SEGUE
             
             
             
             
             
-                       
-
-
-
+;Subrotina de Delay                      
 
 DELAY1SEC:
             
@@ -248,13 +255,18 @@ HERE        BRCLR TFLG1,%00010000,HERE   ;Branch HERE se for zero.
             RTS
             
             
+;-----------ISR for XIRQ
 
+XIRQ_EDGE:  CLR CONTSEC
+            CLR CONTMIN
             
+            RTI            
             
-
-            
-                                  
-
-
+;**************************************************************
+;*                 Interrupt Vectors                          *
+;**************************************************************
+                                                                   
             ORG   $FFFE
             DC.W  Entry           ; Reset Vector
+            ORG   $FFF4
+            DC.W  XIRQ_EDGE
